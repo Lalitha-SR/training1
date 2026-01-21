@@ -243,7 +243,7 @@ resource "aws_lb" "alb" {
 #18.Target Group
 
 resource "aws_lb_target_group" "tg" {
-  name     = "${var.project_name}-tg"
+  name     = "${var.project_name}-tg1"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc1.id
