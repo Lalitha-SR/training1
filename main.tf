@@ -195,10 +195,10 @@ resource "aws_security_group" "sg1" {
 
 
 #14.policy attachment
-resource "aws_iam_user_policy_attachment" "demo_attach" {
-  user       = aws_iam_user.demo_user.name
-  policy_arn = aws_iam_policy.demo_policy.arn
-}
+#resource "aws_iam_user_policy_attachment" "demo_attach" {
+# user       = aws_iam_user.demo_user.name
+# policy_arn = aws_iam_policy.demo_policy.arn
+#}
 
 
 # 15. Ec2 - web1(public)
