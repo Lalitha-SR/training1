@@ -151,10 +151,10 @@ resource "aws_security_group" "sg1" {
 
 #11.key pair
 
-resource "aws_key_pair" "demov1" {
-  key_name   = "demov1"
-  public_key = file("C:\\Users\\lalitsr\\vpc\\demov1.pub")
-}
+#resource "aws_key_pair" "demov1" {
+# key_name   = "demov1"
+# public_key = file("C:\\Users\\lalitsr\\vpc\\demov1.pub")
+#}
 
 #12.IAM user
 resource "aws_iam_user" "demo_user" {
@@ -166,10 +166,8 @@ resource "aws_iam_user" "demo_user" {
 }
 
 #13.IAM policy
-
 resource "aws_iam_policy" "demo_policy" {
-  name        = "${var.project_name}-policy"
-  description = "Allow EC2 describe and S3 read access"
+  name = "${var.project_name}-policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -177,21 +175,20 @@ resource "aws_iam_policy" "demo_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ec2:Describe*"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:ListBucket"
+          "ec2:*",
+          "elasticloadbalancing:*",
+          "iam:GetUser",
+          "iam:GetPolicy",
+          "iam:List*",
+          "iam:GetRole",
+          "iam:PassRole"
         ]
         Resource = "*"
       }
     ]
   })
 }
+
 
 #14.policy attachment
 resource "aws_iam_user_policy_attachment" "demo_attach" {
@@ -205,8 +202,8 @@ resource "aws_instance" "web1" {
   ami                         = "ami-02dc6e3e481e2bbc5"
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.pub_sub1.id
-  key_name                    = aws_key_pair.demov1.key_name
-  associate_public_ip_address = "true"
+  key_name                    = "demo"
+  associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.sg1.id]
 
   tags = {
@@ -220,7 +217,7 @@ resource "aws_instance" "db" {
   ami                    = "ami-02dc6e3e481e2bbc5"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.pri_sub1.id
-  key_name               = aws_key_pair.demov1.key_name
+  key_name               = "demo"
   vpc_security_group_ids = [aws_security_group.sg1.id]
 
   tags = {
@@ -300,6 +297,5 @@ output "alb_dns" {
 output "iam_user_name" {
   value = aws_iam_user.demo_user.name
 }
-
 
 

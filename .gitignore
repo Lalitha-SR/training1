@@ -2,9 +2,9 @@
 .terraform/
 *.tfstate
 *.tfstate.*
-*.tfvars
 *.out
 .crash.log
+.terraform.lock.hcl.*
 
 # OS
 .DS_Store
