@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -17,51 +18,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: source-code
-          path: .
-
   init:
     name: Terraform Init
     runs-on: ubuntu-latest
     needs: checkout
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: source-code
+      - uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
-      - run: terraform init
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: terraform-init
-          path: .terraform
+      - name: Terraform Init
+        run: terraform init
 
   plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
     needs: init
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: source-code
+      - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: terraform-init
-
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
-      - run: terraform plan -out=tfplan
+      - name: Terraform Init
+        run: terraform init
 
-      - uses: actions/upload-artifact@v4
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Upload Terraform Plan Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
           path: tfplan
