@@ -151,10 +151,10 @@ resource "aws_security_group" "sg1" {
 
 #11.key pair
 
-resource "aws_key_pair" "demov1" {
-  key_name   = "demov1"
-  public_key = file("C:\\Users\\lalitsr\\vpc\\demov1.pub")
-}
+#resource "aws_key_pair" "demov1" {
+# key_name   = "demov1"
+# public_key = file("C:\\Users\\lalitsr\\vpc\\demov1.pub")
+#}
 
 #12.IAM user
 resource "aws_iam_user" "demo_user" {
@@ -205,7 +205,7 @@ resource "aws_instance" "web1" {
   ami                         = "ami-02dc6e3e481e2bbc5"
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.pub_sub1.id
-  key_name                    = aws_key_pair.demov1.key_name
+  key_name                    = demo
   associate_public_ip_address = "true"
   vpc_security_group_ids      = [aws_security_group.sg1.id]
 
@@ -220,7 +220,7 @@ resource "aws_instance" "db" {
   ami                    = "ami-02dc6e3e481e2bbc5"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.pri_sub1.id
-  key_name               = aws_key_pair.demov1.key_name
+  key_name               = demo
   vpc_security_group_ids = [aws_security_group.sg1.id]
 
   tags = {
