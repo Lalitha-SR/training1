@@ -161,37 +161,37 @@ resource "aws_security_group" "sg1" {
 #}
 
 #12.IAM user
-resource "aws_iam_user" "demo_user" {
-  name = "${var.project_name}-user"
-
-  tags = {
-    Managed_by = var.managed_by
-  }
-}
+#resource "aws_iam_user" "demo_user" {
+# name = "${var.project_name}-user"
+#
+# tags = {
+#   Managed_by = var.managed_by
+# }
+#}
 
 #13.IAM policy
-resource "aws_iam_policy" "demo_policy" {
-  name = "${var.project_name}-policy"
+#resource "aws_iam_policy" "demo_policy" {
+#  name = "${var.project_name}-policy"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:*",
-          "elasticloadbalancing:*",
-          "iam:GetUser",
-          "iam:GetPolicy",
-          "iam:List*",
-          "iam:GetRole",
-          "iam:PassRole"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
+ # policy = jsonencode({
+  #  Version = "2012-10-17"
+   # Statement = [
+    #  {
+     #   Effect = "Allow"
+      #  Action = [
+       #   "ec2:*",
+        #  "elasticloadbalancing:*",
+         # "iam:GetUser",
+          #"iam:GetPolicy",
+#         "iam:List*",
+#         "iam:GetRole",
+#         "iam:PassRole"
+#       ]
+#       Resource = "*"
+#     }
+#   ]
+#})
+#}
 
 
 #14.policy attachment
