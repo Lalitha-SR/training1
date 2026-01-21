@@ -45,6 +45,21 @@ jobs:
 
       - run: terraform plan -out=tfplan
 
+      # Save tfplan for next job
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-temp
+          path: tfplan
+
+  upload:
+    name: Upload Terraform Plan Artifact
+    runs-on: ubuntu-latest
+    needs: plan
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: tfplan-temp
+
       - uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
