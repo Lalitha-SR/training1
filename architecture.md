@@ -31,6 +31,8 @@ flowchart TB
         DynamoDB[("DynamoDB Global Table<br/><i>dynamodb_module</i><br/>Streams enabled")]
         SNS["SNS Topic<br/><i>sns_module</i>"]
         SQS["SQS Queue<br/><i>sqs_module</i>"]
+        SQS_DLQ["SQS DLQ<br/><i>sqs_module</i>"]
+        Stream_DLQ["Stream Lambda DLQ<br/><i>lambda_stream_processor</i>"]
     end
 
     subgraph Security["Security & config"]
@@ -49,8 +51,10 @@ flowchart TB
 
     DynamoDB -->|stream| LambdaStream
     LambdaStream -->|publish| SNS
+    LambdaStream -.->|on failure| Stream_DLQ
     SNS -->|subscribe| SQS
     SQS -->|trigger| LambdaSQS
+    SQS -.->|redrive after max receives| SQS_DLQ
 ```
 
 ## Component Summary
@@ -64,15 +68,17 @@ flowchart TB
 | **KMS policy** | `aws_iam_policy.kms_decrypt_policy` | IAM policy for ECS task execution (KMS decrypt) |
 | **DynamoDB** | `dynamodb_module` | Global table with streams (hash key `id`) |
 | **SNS** | `sns_module` | SNS topic for event fan-out |
-| **SQS** | `sqs_module` | Queue subscribed to SNS (`sns_to_sqs` + queue policy) |
-| **Lambda (stream)** | `lambda_stream_processor` | Triggered by DynamoDB stream; publishes to SNS |
+| **SQS** | `sqs_module` | Main queue subscribed to SNS (`sns_to_sqs` + queue policy) |
+| **SQS DLQ** | `sqs_module` | Dead-letter queue for main SQS; messages redrive after max receive count |
+| **Lambda (stream)** | `lambda_stream_processor` | Triggered by DynamoDB stream; publishes to SNS; failed records → Stream Lambda DLQ |
+| **Stream Lambda DLQ** | `lambda_stream_processor` | DLQ for failed DynamoDB stream records (Lambda destination on failure) |
 | **Lambda (SQS)** | `lambda_sqs_processor` | Triggered by SQS; processes messages from SNS → SQS |
 
 ## Data flow
 
 1. **Request path:** Client → ALB → External Target Group → ECS tasks. Optional internal path via Internal Target Group.
 2. **App data:** ECS reads/writes DynamoDB; ECS uses Secrets Manager and KMS (decrypt) for config/secrets.
-3. **Event pipeline:** DynamoDB stream → Stream Lambda → SNS → SQS → SQS Lambda (async processing).
+3. **Event pipeline:** DynamoDB stream → Stream Lambda → SNS → SQS → SQS Lambda (async processing). Failed stream records go to Stream Lambda DLQ; SQS messages that exceed max receives go to SQS DLQ.
 
 ## Mermaid preview
 
